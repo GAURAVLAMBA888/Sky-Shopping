@@ -1,12 +1,15 @@
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import Badge from '@mui/material/Badge';
+import Badge from "@mui/material/Badge";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
 import { mobile } from "../responsive";
+import { Link } from "react-router-dom";
+import { logout } from "../redux/userRedux";
 
 const Container = styled.div`
   height: 60px;
-  ${mobile({ height: '50px' })}
+  ${mobile({ height: "50px" })}
 `;
 
 const Wrapper = styled.div`
@@ -21,7 +24,7 @@ const Left = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-  ${mobile({display : "none"})}
+  ${mobile({ display: "none" })}
 `;
 
 const Language = styled.span`
@@ -67,6 +70,10 @@ const MenuItem = styled.div`
 `;
 
 const Navbar = () => {
+  const quantity = useSelector((state) => state.cart.quantity);
+  const user = useSelector((state) => state.user).currentUser == null ? false : true;
+  const dispatch = useDispatch();
+
   return (
     <Container>
       <Wrapper>
@@ -78,16 +85,25 @@ const Navbar = () => {
           </SearchContainer>
         </Left>
         <Center>
-          <Logo>Sky Shopping</Logo>
+          <Link to={"/"} className="link">
+            <Logo>Sky Shopping</Logo>
+          </Link>
         </Center>
         <Right>
-          <MenuItem>REGISTER</MenuItem>
-          <MenuItem>SIGN IN</MenuItem>
-          <MenuItem>
-            <Badge badgeContent={4} color="primary">
-              <ShoppingCartOutlinedIcon />
-            </Badge>
-          </MenuItem>
+          {user || <Link to="/register" className="link">
+            <MenuItem>REGISTER</MenuItem>
+          </Link>}
+          {user || <Link to={"/login"} className="link">
+            <MenuItem>LOGIN</MenuItem>
+          </Link>}
+          {user && <MenuItem onClick={() => dispatch(logout())}>LOGOUT</MenuItem>}
+          <Link to="/cart" className="link">
+            <MenuItem>
+              <Badge badgeContent={quantity} color="primary">
+                <ShoppingCartOutlinedIcon />
+              </Badge>
+            </MenuItem>
+          </Link>
         </Right>
       </Wrapper>
     </Container>

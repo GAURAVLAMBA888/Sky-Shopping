@@ -1,10 +1,15 @@
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteIcon from '@mui/icons-material/Delete';
 import styled from "styled-components";
 import Announcement from "../components/Announcement";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteProduct, findAndUpdate } from '../redux/cartRedux';
+import { userRequest } from "../requestMethods";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div``;
 
@@ -33,6 +38,9 @@ const TopButton = styled.button`
   background-color: ${(props) =>
     props.type === "filled" ? "black" : "transparent"};
   color: ${(props) => props.type === "filled" && "white"};
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const TopTexts = styled.div`
@@ -57,6 +65,7 @@ const Info = styled.div`
 const Product = styled.div`
   display: flex;
   justify-content: space-between;
+  position: relative;
   ${mobile({ flexDirection: "column" })}
 `;
 
@@ -76,16 +85,33 @@ const Details = styled.div`
   justify-content: space-around;
 `;
 
+const Delete = styled.div`
+  position: absolute;
+  top: 10px;
+  bottom: 0;
+  right: 20px;
+  color: red;
+  cursor: pointer;
+`
+
 const ProductName = styled.span``;
 
 const ProductId = styled.span``;
 
 const ProductColor = styled.div`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: ${(props) => props.color};
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 `;
+
+const ProductColorDisplay = styled.div`
+margin-left: 5px;
+width: 20px;
+height: 20px;
+border-radius: 50%;
+background-color: ${(props) => props.color};
+`;
+
 
 const ProductSize = styled.span``;
 
@@ -101,11 +127,19 @@ const ProductAmountContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  cursor: pointer;
 `;
 
 const ProductAmount = styled.div`
   font-size: 24px;
-  margin: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid teal;
+  cursor : default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   ${mobile({ margin: "5px 15px" })}
 `;
 
@@ -151,9 +185,43 @@ const Button = styled.button`
   background-color: black;
   color: white;
   font-weight: 600;
+  cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const Cart = () => {
+  const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user).currentUser == null ? false : true;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    if(user) {
+      const res = await userRequest.post("/checkout/create-checkout-session", cart);
+      window.location.replace(res.data.url);
+    } else {
+      navigate('/login');
+    }
+  }
+
+  const deleteItem = (product) => {
+    dispatch(deleteProduct({product}));
+  }
+
+  const handleQuantity = ({product, type}) => {
+    let newQuantity;
+    newQuantity = type === 'inc' ? product.quantity+1 : product.quantity-1;
+    if(newQuantity === 0){
+      dispatch(deleteProduct({product}));
+    }
+    else{
+      dispatch(findAndUpdate({product, newQuantity}));
+    }
+  }
+
   return (
     <Container>
       <Navbar />
@@ -166,81 +234,69 @@ const Cart = () => {
             <TopText>Shopping Bag(2)</TopText>
             <TopText>Your Wishlist (0)</TopText>
           </TopTexts>
-          <TopButton type="filled">CHECKOUT NOW</TopButton>
+          <TopButton type="filled" onClick={handleCheckout} disabled={cart.quantity === 0}>CHECKOUT NOW</TopButton>
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetail>
-                <Image src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1614188818-TD1MTHU_SHOE_ANGLE_GLOBAL_MENS_TREE_DASHERS_THUNDER_b01b1013-cd8d-48e7-bed9-52db26515dc4.png?crop=1xw:1.00xh;center,top&resize=480%3A%2A" />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> JESSIE THUNDER SHOES
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                  <ProductColor color="black" />
-                  <ProductSize>
-                    <b>Size:</b> 37.5
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <AddIcon />
-                  <ProductAmount>2</ProductAmount>
-                  <RemoveIcon />
-                </ProductAmountContainer>
-                <ProductPrice>$ 30</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.pinimg.com/originals/2d/af/f8/2daff8e0823e51dd752704a47d5b795c.png" />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> HAKURA T-SHIRT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                  <ProductColor color="gray" />
-                  <ProductSize>
-                    <b>Size:</b> M
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <AddIcon />
-                  <ProductAmount>1</ProductAmount>
-                  <RemoveIcon />
-                </ProductAmountContainer>
-                <ProductPrice>$ 20</ProductPrice>
-              </PriceDetail>
-            </Product>
+            {cart.products.map((product) => {
+              return (
+                <>
+                <Product key={product._id}>
+                  <Delete>
+                    <DeleteIcon onClick={() => deleteItem(product)}/>
+                  </Delete>
+                  <ProductDetail>
+                    <Image src={product.img} />
+                    <Details>
+                      <ProductName>
+                        <b>Product:</b> {product.title}
+                      </ProductName>
+                      <ProductId>
+                        <b>ID:</b> {product._id}
+                      </ProductId>
+                      <ProductColor>
+                       <b> Color:</b> <ProductColorDisplay color={product.color} />
+                      </ProductColor>
+                      <ProductSize>
+                        <b>Size:</b> {product.size}
+                      </ProductSize>
+                    </Details>
+                  </ProductDetail>
+                  <PriceDetail>
+                    <ProductAmountContainer>
+                      <AddIcon onClick={() => handleQuantity({product, type:'inc'})}/>
+                      <ProductAmount>{product.quantity}</ProductAmount>
+                      <RemoveIcon onClick={() => handleQuantity({product, type:'dec'})}/>
+                    </ProductAmountContainer>
+                    <ProductPrice>
+                      Rs. {product.price * product.quantity}
+                    </ProductPrice>
+                  </PriceDetail>
+                </Product>
+                <Hr />
+                </>
+              );
+            })}
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
+              <SummaryItemPrice>Rs. {cart.total}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Estimated Shipping</SummaryItemText>
-              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
+              <SummaryItemPrice>Rs. 100</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Shipping Discount</SummaryItemText>
-              <SummaryItemPrice>$ -5.90</SummaryItemPrice>
+              <SummaryItemPrice>Rs. -100</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
+              <SummaryItemPrice>Rs. {cart.total}</SummaryItemPrice>
             </SummaryItem>
-            <Button>CHECKOUT NOW</Button>
+            <Button onClick={(e) => handleCheckout(e)} disabled={cart.quantity === 0}> Checkout Now </Button>
           </Summary>
         </Bottom>
       </Wrapper>
