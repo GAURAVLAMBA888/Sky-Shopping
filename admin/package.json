@@ -1,24 +1,19 @@
 {
-  "name": "client",
+  "name": "admin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.13.3",
-    "@reduxjs/toolkit": "^1.9.5",
-    "@stripe/react-stripe-js": "^2.1.1",
-    "@stripe/stripe-js": "^1.54.1",
-    "axios": "^1.4.0",
+    "@mui/x-data-grid": "^6.5.0",
     "react": "^18.2.0",
+    "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.1.1",
-    "react-router-dom": "^6.13.0",
-    "react-scripts": "5.0.1",
-    "react-stripe-checkout": "^2.6.3",
-    "redux-persist": "^6.0.0",
-    "styled-components": "^5.3.11"
+    "react-router-dom": "^6.11.2",
+    "react-scripts": "^5.0.1",
+    "recharts": "^2.6.2",
+    "sass": "^1.62.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,4 +1,4 @@
-const Order = require("../models/Order");
+const Order = require("../Models/Order");
 const {
   verifyToken,
   verifyTokenAndAuthorization,
@@ -11,7 +11,6 @@ const router = require("express").Router();
 
 router.post("/", verifyToken, async (req, res) => {
   const newOrder = new Order(req.body);
-
   try {
     const savedOrder = await newOrder.save();
     res.status(200).json(savedOrder);

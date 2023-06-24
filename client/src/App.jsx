@@ -21,8 +21,8 @@ const App = () => {
         <Route path='/products/:category' element={<ProductList />} />
         <Route path='/product/:id' element={<Product />} />
         <Route path='/cart' element={<Cart />} />
-        <Route path='/success' element={!user ? <Navigate to="/"/> : <Success />} />
-        <Route path='/cancel' element={!user ? <Navigate to="/"/> : <Cancel />} />
+        <Route path='/success' element={user ? <Success /> : <Navigate to="/"/>} />
+        <Route path='/cancel' element={user ? <Cancel /> : <Navigate to="/"/> } />
         <Route path='/register' element={user ? <Navigate to="/"/> : <Register />} />
         <Route path='/login' element={user ? <Navigate to="/"/> : <Login />} />
         <Route path='*' element={ <NotFound/> } />

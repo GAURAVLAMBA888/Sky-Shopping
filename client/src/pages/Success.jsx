@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { userRequest } from "../requestMethods";
+import { useLocation } from "react-router-dom";
 
 const Success = () => {
   const cart = useSelector((state) => state.cart);
   const currentUser = useSelector((state) => state.user.currentUser);
   const [orderId, setOrderId] = useState(null);
+  const location = useLocation();
+  console.log(location);
 
   useEffect(() => {
     const createOrder = async () => {
@@ -16,14 +19,14 @@ const Success = () => {
             productId: item._id,
             quantity: item._quantity,
           })),
-          amount: cart.total,
-          address: "asdf",
+          amount: cart.total
         });
         setOrderId(res.data._id);
-      } catch {}
+        console.log(res);
+      } catch (err) { console.log(err) }
     };
     createOrder();
-  }, [cart, currentUser]);
+  }, []);
 
   return (
     <div
