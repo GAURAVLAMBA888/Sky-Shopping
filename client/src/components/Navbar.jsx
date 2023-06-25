@@ -97,6 +97,9 @@ const Navbar = () => {
             <MenuItem>LOGIN</MenuItem>
           </Link>}
           {user && <MenuItem onClick={() => dispatch(logout())}>LOGOUT</MenuItem>}
+          {user && <Link to={"/orders"} className="link">
+            <MenuItem>ORDERS</MenuItem>
+          </Link>}
           <Link to="/cart" className="link">
             <MenuItem>
               <Badge badgeContent={quantity} color="primary">

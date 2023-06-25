@@ -7,6 +7,7 @@ import Cart from "./pages/Cart";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
+import Orders from "./pages/Orders";
 import { useSelector } from "react-redux";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/success' element={user ? <Success /> : <Navigate to="/"/>} />
         <Route path='/cancel' element={user ? <Cancel /> : <Navigate to="/"/> } />
+        <Route path='/orders' element={user ? <Orders /> : <Navigate to="/"/> } />
         <Route path='/register' element={user ? <Navigate to="/"/> : <Register />} />
         <Route path='/login' element={user ? <Navigate to="/"/> : <Login />} />
         <Route path='*' element={ <NotFound/> } />

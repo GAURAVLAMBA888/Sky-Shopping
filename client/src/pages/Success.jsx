@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { userRequest } from "../requestMethods";
-import { useLocation } from "react-router-dom";
+import {clearCart} from '../redux/cartRedux';
 
 const Success = () => {
   const cart = useSelector((state) => state.cart);
   const currentUser = useSelector((state) => state.user.currentUser);
-  const [orderId, setOrderId] = useState(null);
-  const location = useLocation();
-  console.log(location);
+  const dispatch = useDispatch();
+  
+  const params = new URLSearchParams(window.location.search);
 
   useEffect(() => {
     const createOrder = async () => {
@@ -21,28 +21,19 @@ const Success = () => {
           })),
           amount: cart.total
         });
-        setOrderId(res.data._id);
-        console.log(res);
+        dispatch(clearCart());
       } catch (err) { console.log(err) }
+      window.location.replace('/orders');
     };
-    createOrder();
+    return () => {
+      if(params.get('success') === process.env.REACT_APP_SUCCESS_KEY)
+       createOrder();
+      else window.location.replace('/cancel');
+    };
   }, []);
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {orderId
-        ? `Order has been created successfully. Your order number is ${orderId}`
-        : `Successfull. Your order is being prepared...`}
-      <button style={{ padding: 10, marginTop: 20 }}>Go to Homepage</button>
-    </div>
+    <></>
   );
 };
 
