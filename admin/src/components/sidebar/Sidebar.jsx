@@ -12,8 +12,11 @@ import SettingsSystemDaydreamOutlinedIcon from "@mui/icons-material/SettingsSyst
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/userRedux";
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
 
   return (
     <div className="sidebar">
@@ -26,12 +29,12 @@ const Sidebar = () => {
       <div className="center">
         <ul>
           <p className="title">MAIN</p>
-          <li>
-            <DashboardIcon className="icon" />
-            <Link to="/" style={{ textDecoration: "none" }}>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <li>
+              <DashboardIcon className="icon" />
               <span>Dashboard</span>
-            </Link>
-          </li>
+            </li>
+          </Link>
           <p className="title">LISTS</p>
           <Link to="/users" style={{ textDecoration: "none" }}>
             <li>
@@ -80,19 +83,15 @@ const Sidebar = () => {
             <AccountCircleOutlinedIcon className="icon" />
             <span>Profile</span>
           </li>
-          <li>
+          <li onClick={() => dispatch(logout())}>
             <ExitToAppIcon className="icon" />
             <span>Logout</span>
           </li>
         </ul>
       </div>
       <div className="bottom">
-        <div
-          className="colorOption"
-        ></div>
-        <div
-          className="colorOption"
-        ></div>
+        <div className="colorOption"></div>
+        <div className="colorOption"></div>
       </div>
     </div>
   );
